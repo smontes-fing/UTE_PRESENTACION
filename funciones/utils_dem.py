@@ -255,22 +255,25 @@ def cargar_set_datos_2(dir_demanda, dir_pbi, dir_feriados, anio_ini, anio_fin, c
 #%% Cargar csv de datos simulados
 
 def cargar_datos_dem_sint(
-        data_path,
-        ener_proy,
-        ener_base
-        ):
+        data_path: str,
+        ener_proy: float,
+        ener_base: float
+        ) -> pd.DataFrame:
     """
     Función para cargar datos de demanda sintética desde una ruta de datos especificada.
     
     Parámetros:
-    data_path (str): La ruta al archivo CSV que contiene los datos de demanda sintética.
+        data_path (str): La ruta al archivo CSV que contiene los datos de demanda sintética.
+        ener_proy (float): La energía proyectada para el año que se va a simular.
+        ener_base (float): La energía base para el año que se va a simular.
     
     Retorno:
-    pandas.DataFrame: Los datos de demanda sintética cargados como un DataFrame de pandas.
+        pandas.DataFrame: Los datos de demanda sintética cargados como un DataFrame de pandas.
     """
     try:
         data = pd.read_csv(data_path, engine='pyarrow')
-        data = data 
+        if data_path == 'datos/dem_sintetico_100.csv': 
+            data = data * (ener_proy/ener_base)
     except FileNotFoundError:
         raise FileNotFoundError(f'Error: la ruta {data_path} para'+ 
                                 'levantar los datos de demanda sintetica no fue encontrado.')

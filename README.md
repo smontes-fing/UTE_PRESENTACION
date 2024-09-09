@@ -9,8 +9,14 @@ Existe una carpeta ['../datos'](../datos) con documentos, datos y notas relevant
 Clonar el repositorio:
 
 ```console
-git clone https://github.com/smontes-fing/UTE_E2.git
+!git clone https://github.com/smontes-fing/UTE_PRESENTACION.git
 ```
+
+## Notebooks 
+- [predecir_demanda.ipynb](https://colab.research.google.com/drive/1Dv_krXmmoliADKn0dZpeN01_aZRF1jv_?authuser=1#scrollTo=PdaFGqh-dhTG)
+- [generar_estadisticas.ipynb](https://colab.research.google.com/drive/1ykFmRU2u9V0cXB4ueDQmvvchR7nYdDUR?authuser=1#scrollTo=O1PRXnYkrm6b)
+
+
 
 ##Archivos relevantes
 

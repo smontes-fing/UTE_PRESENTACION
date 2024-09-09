@@ -13,6 +13,7 @@ para dos escenarios diferentes (tarifa plana, es decir cargar cuando llegan a ca
 """
 
 import numpy as np
+from typing import Optional, List
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.interpolate import interp1d
@@ -94,16 +95,26 @@ def probabilidad_carga_EVs(tipo= 'BaU'):
 
     return [charge_evs, charge_bus, charge_hev]
     
-def graficar_curvas_carga_normalizadas(curvas_carga_norm, 
-                                       ruta = None):
+def graficar_curvas_carga_normalizadas(
+    curvas_carga_norm: List[np.ndarray], 
+    ruta: Optional[str] = "output/curvas_carga_normalizadas.png"
+) -> None:
     '''
     Función que grafica las curvas normalizadas de carga de los tipos de vehículos eléctricos
+
     Parámetros
-    curvas_carga_norm : List
-        Descripción.
-        lista de curvas de carga
+    ----------
+    curvas_carga_norm : List[np.ndarray]
+        lista de curvas de carga normalizadas. Debe contener 3 elementos, correspondientes a:
+            - curvas_carga_norm[0] : curva de carga de vehículos eléctricos livianos
+            - curvas_carga_norm[1] : curva de carga de vehículos eléctricos pesados
+            - curvas_carga_norm[2] : curva de carga de buses eléctricos
+    ruta : Optional[str], optional
+        ruta del archivo en el que se guardará la gráfica, por defecto es None
+
     Retorna
-    None.
+    -------
+    None
     '''
     evs = curvas_carga_norm[0]
     buses = curvas_carga_norm[1]
@@ -117,38 +128,41 @@ def graficar_curvas_carga_normalizadas(curvas_carga_norm,
     plt.ylabel("Probabilidad %")
     plt.xlabel("Hora del día")
     plt.title("Curva de probabilidad de carga")
-    if ruta != None:
+    if ruta is not None:
         plt.savefig(ruta)
     plt.show(block=False)
 
-def EV_consumption_hh(period, EVs, perfiles,
-                   consumo = [5,190,100], # kWh/dia
-                   ):
+def EV_consumption_hh(
+    period: pd.DataFrame, 
+    EVs: List[int], 
+    perfiles: List[np.ndarray], 
+    consumo: List[int] = [5, 190, 100]  # kWh/dia
+) -> pd.DataFrame:
     """ 
     Esta funcion clcula la demanda de los diferentes EV, tomando como entrada 3 tipos de EVs,
     su consumo medio diario y la curva normalizada de carga
-    Args:
-            period: periodo de tiempo (horario) para el cual calcular el consumo
-                DataFrame("mes","dia", "hora", "dia_sem")
-            evs: cantidad esperada de vehículos livianos
-                int
-            buses: cantidad esperada de buses eléctricos
-                int
-            heavy_ev: cantidad esperada de camiones y vehículos pesados
-                int
-            consumption: consumo medio kW/dia- datos Observatorio Movilidad 2023 https://montevideo.gub.uy/observatorio-de-movilidad
-                list[int] = [con_evs, con_bus, con_hev] = 
+    Parameters
+    ----------
+    period : pd.DataFrame
+        Periodo de tiempo (horario) para el cual calcular el consumo
+        DataFrame("mes","dia", "hora", "dia_sem")
+    EVs : List[int]
+        Cantidad esperada de vehículos livianos, buses eléctricos y camiones y vehículos pesados
+    perfiles : List[np.ndarray]
+        Perfiles de consumo normalizados para cada tipo de trasnporte
+        list[np.array(24)] = [BaU-evs, BaU_bus, BaU_hev]
+    consumo : List[int], optional
+        Consumo medio kW/dia- datos Observatorio Movilidad 2023 https://montevideo.gub.uy/observatorio-de-movilidad
+        list[int] = [con_evs, con_bus, con_hev] = 
                             consumo = kwh/km * km/dia
                             autos privados = 0.15 kWh/km * 20 km/dia
                             bus = 1.11 kWh/km * 170 km/dia
                             camiones =  0.5 kWh/km * 100 km/dia
-            Effective usage:    the average use of a specified vehicle type, divided into weekdays and
-                                weekends (each one with a chosen charge profile), expressed in km per day
-                list[int] = [weekday, weekend]
-            perfiles = perfiles de consumo normalizados para cada tipo de trasnporte
-                list[np.array(24)] = [BaU-evs, BaU_bus, BaU_hev]
-        
-        Returns perfil de consumo
+        By default [5, 190, 100]
+    Returns
+    -------
+    pd.DataFrame
+        Perfil de consumo
     """
     evs     = EVs[0] 
     buses   = EVs[1]
@@ -164,9 +178,9 @@ def EV_consumption_hh(period, EVs, perfiles,
     return cons
 
 # ==============================================================================================
-#%% Cálculo de energía de EVs
+# Cálculo de energía de EVs
 
-def EV_consumption_Ener(consumo):
+def EV_consumption_Ener(consumo, e_proy):
     """ 
     Esta funcion calcula el consumo de energia del parque vehícular de EV en el periodo en formato horario.
     Args
@@ -177,11 +191,11 @@ def EV_consumption_Ener(consumo):
         """
 
     e_evs = consumo["Pot_evs"].sum()
-    print(f'Energía consumida por light-duty evs: {e_evs}')
+    print(f'Energía consumida por light-duty evs: {round(e_evs, 3)}, % del total de energía consumida: {round(e_evs/e_proy,3)} %')
     bus   = consumo["Pot_bus"].sum()
-    print(f'Energía consumida por buses eléctricos: {bus}')
+    print(f'Energía consumida por buses eléctricos: {round(bus,3)}, % del total de energía consumida: {round(bus/e_proy,3)} %')
     H_evs = consumo["Pot_hev"].sum()
-    print(f'Energía consumida por Heavy-duty evs: {H_evs}')
+    print(f'Energía consumida por Heavy-duty evs: {round(H_evs,3)}, % del total de energía consumida: {round(H_evs/e_proy,3)} %')
     energia = e_evs + bus + H_evs
     return energia
 

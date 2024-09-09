@@ -24,6 +24,7 @@ from funciones.utils_driverEVs import (
 from funciones.utils import (
     def_rango_fecha,
     plot_POE,
+    plot_densidades_escenarios
 )
 
 def main(
@@ -72,7 +73,12 @@ def main(
     _, num_years = demand_data.shape
 
     # Genera los datos del Driver EV
-    ev_data, _ = proyeccion_driver_EV(year, ev_list, curva, calendar)
+    ev_data, _ = proyeccion_driver_EV(year, 
+                                      ev_list, 
+                                      curva, 
+                                      calendar, 
+                                      energy_proy
+                                      )
 
     # Merge de los dos dataframes demand_data y ev_data
     merged_data = pd.merge(demand_data, ev_data, left_index=True, right_index=True)
@@ -89,13 +95,25 @@ def main(
         year_to_show = f'{random.randint(0, num_years - 1)}'
     data_to_show = merged_data[[year_to_show, 'Pot_evs', 'Pot_bus', 'Pot_hev']]
     week_data = data_to_show.loc[start_date:end_date]
-    plot_datos_semana(week_data, start_date, end_date)
+    plot_datos_semana(week_data, 
+                      start_date, 
+                      end_date,
+                      year,
+                      curva)
 
     # Analisis de resultados
-
-    plot_POE(merged_data[year_to_show]) # probabildiad de excedencia
+    PoE_path = f"output/PoE_{curva}_{year}.png"
+    plot_POE(merged_data[year_to_show], PoE_path) # probabildiad de excedencia
    
-    
+    # analisis de picos anuales
+    statistics = analizar_demanda(merged_data, num_years)
+    key = f"{curva}_{year}"
+    dicc_estadisticas = {key: statistics}
+    densidades_path = f"output/densidad_de_picos_{year}_{curva}.png"
+    plot_densidades_escenarios(dicc_estadisticas[key], 
+                               title= f"Densidad de picos anuales proyectada para {year}",
+                               path=densidades_path
+                               )
 
     # return diccionario con las estadísticas para las curvas BaU y ToU
 
@@ -103,8 +121,9 @@ def main(
 def proyeccion_driver_EV(
     ano: int,
     lista_evs: list,
-    curva = str,
-    calendario = pd.DataFrame,
+    curva: str,
+    calendario: pd.DataFrame,
+    e_proy: float
 ):
     # Normalizar la curva de carga de vehículos eléctricos
     perfil_carga_norm = probabilidad_carga_EVs(curva)
@@ -121,40 +140,58 @@ def proyeccion_driver_EV(
     
     # Definir cantidad de vehículos por tipo y calcular el consumo
     dem_driver_EVs = EV_consumption_hh(calendario, EVs_estimada, perfil_carga_norm)
-    energia_Driver_Evs = EV_consumption_Ener(dem_driver_EVs)
+    energia_Driver_Evs = EV_consumption_Ener(dem_driver_EVs,
+                                             e_proy=e_proy
+                                             )
 
     return dem_driver_EVs, energia_Driver_Evs
 
 def plot_datos_semana(
-    datos_semana: pd.DataFrame, 
-    fecha_inicio: str, 
-    fecha_fin: pd.Timestamp
-) -> None:
+    datos_semana: pd.DataFrame,  # DataFrame con los datos a graficar
+    fecha_inicio: str,  # Fecha de inicio de la semana
+    fecha_fin: pd.Timestamp,  # Fecha de fin de la semana
+    year: int,  # Año de los datos
+    curva: str  # Tipo de curva de carga
+) -> None:  # No retorna ningún valor
     """
-    Plot the data for a specific week.
+    Graficar los datos para una semana específica.
 
-    Parameters
+    Parámetros
     ----------
     datos_semana : pd.DataFrame
-        The data to plot.
+        DataFrame con los datos a graficar.
     fecha_inicio : str
-        The start date of the week.
+        Fecha de inicio de la semana.
     fecha_fin : pd.Timestamp
-        The end date of the week.
+        Fecha de fin de la semana.
+    year : int
+        Año de los datos.
+    curva : str
+        Tipo de curva de carga.
 
-    Returns
+    Retorna
     -------
     None
     """
+    
+    # Graficar el DataFrame como un gráfico de área y modificar la etiqueta para la leyenda
+    ax = datos_semana.plot(kind='area', stacked=True, figsize=(10, 6), label='dem_as_usual')
 
-    datos_semana.plot(kind='area', stacked=True, figsize=(10, 6))
+    # Ajustar las etiquetas de los ejes y el título
     plt.xlabel('Hora del día')
     plt.ylabel('Potencia')
     plt.ylim(0, 3000)
-    plt.title(f'Proyección de penetración alta y carga BaU- Semana del {fecha_inicio} al {fecha_fin.strftime("%Y-%m-%d")}')
-    plt.legend()
-    plt.savefig('output/proy_EV_main.png')
+    plt.title(f'Proyección de EVs para {year} y curva de carga {curva} - Semana del {fecha_inicio} al {fecha_fin.strftime("%Y-%m-%d")}')
+
+    # Personalizar la leyenda
+    #plt.legend(['dem_as_usual'])
+
+    # Guardar la gráfica en un archivo
+    plt.savefig(f'output/proy_EV_{year}_{curva}.png')
+
+    # Mostrar la gráfica
     plt.show()
+
 
 def analizar_demanda(predicc, anos_to_sim):
     

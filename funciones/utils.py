@@ -103,8 +103,10 @@ def plot_densidades_escenarios(
     plt.show()
 
 
-def plot_POE(annmax: pd.Series,
-             fig_path: str = 'output/POE.png') -> None:
+def plot_POE(
+    annmax: pd.Series,  # Time series of annual maxima
+    fig_path: str = 'output/POE.png'  # Path to save the plot
+) -> None:
     """Plot the Probability of Exceedance (PoE) of a given time series of annual maxima.
 
     The PoE is the likelihood that a maximum or minimum demand forecast will be met or exceeded.
@@ -115,6 +117,8 @@ def plot_POE(annmax: pd.Series,
     ----------
     annmax : pd.Series
         Time series of annual maxima.
+    fig_path : str, optional
+        Path to save the plot, by default 'output/POE.png'.
 
     Returns
     -------
