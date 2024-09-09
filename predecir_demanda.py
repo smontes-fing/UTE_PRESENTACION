@@ -66,8 +66,6 @@ def preprocess_data(
     else:
         raise ValueError(f'Tipo desconocido: {tipo}')
 
-    ic(columnas_fature)
-
     return data_in, label_in, columnas_fature, features_size
 
 
@@ -169,10 +167,9 @@ def generar_predicciones(
     for ano in range(anos_to_sim):
         col = 'Ano_' + str(ano)
         data_raw = pd.DataFrame()
-        # columnas= ['DiaSemana', 'Mes', 'Dia', 'Hora', col, 'Demanda_ener']
         columnas= ['DiaSemana', 'Mes', 'Dia', 'Hora', 'Temp']
         data_raw = data_temp[columnas]
-        ic(data_raw.head(3))
+        print(data_raw.head(3))
         data_in, _, _, _ = preprocess_data(data_raw, 
                                        tipo=model_type, 
                                        one_hot_columns=['Mes', 'Dia', 'DiaSemana', 'Hora'], 
@@ -225,7 +222,8 @@ def main(
     model_path (str): Ruta del archivo del modelo
     scaler_path (str): Ruta del archivo del escalador
     """
-    
+
+
     print("Cargando datos de temperatira")
     data_temp = load_data(input_path)
     e_obj, e_base   =  fijar_energia_anual(ano_to_predict)
@@ -250,7 +248,8 @@ def main(
     # Preprocess de los datos de calendario
     date_range = def_rango_fecha(str(ano_to_predict))
 
-    df_pred.index = date_range
+    # df_pred.iloc[:8760].index = date_range
+    df_pred.iloc.index = date_range    
 
 
     start_date = f'{ano_to_predict}-06-15'
