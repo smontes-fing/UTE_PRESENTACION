@@ -56,6 +56,7 @@ def main(
     temp_data = cargar_datos_temp_sint(temp_data_path)
     calendar = temp_data[['DiaSemana', 'Mes', 'Dia', 'Hora']]
 
+
     # Carga la proyecctión de energía segun PBI hasta 2050
     pbi_proyection_path = 'datos/proy_econometrica_PBI.csv'
     pbi_proy = pd.read_csv(pbi_proyection_path, engine='pyarrow')
@@ -151,7 +152,8 @@ def plot_datos_semana(
     fecha_inicio: str,  # Fecha de inicio de la semana
     fecha_fin: pd.Timestamp,  # Fecha de fin de la semana
     year: int,  # Año de los datos
-    curva: str  # Tipo de curva de carga
+    curva: str,  # Tipo de curva de carga
+    path: str = None,  # Ruta para guardar la imagen
 ) -> None:  # No retorna ningún valor
     """
     Graficar los datos para una semana específica.
@@ -187,7 +189,9 @@ def plot_datos_semana(
     #plt.legend(['dem_as_usual'])
 
     # Guardar la gráfica en un archivo
-    plt.savefig(f'output/proy_EV_{year}_{curva}.png')
+    if path is None:
+        path = f'output/proy_EV_{year}_{curva}.png'
+    plt.savefig(path)
 
     # Mostrar la gráfica
     plt.show()

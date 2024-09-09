@@ -10,6 +10,8 @@ from funciones.utils_transform import (
     transform_norm,
     transform_oneHot,
 )
+from generar_estadisticas import plot_datos_semana
+from funciones.utils import def_rango_fecha
 
 def load_data(input_path: str) -> pd.DataFrame:
     """
@@ -91,7 +93,7 @@ def r_squared(
 def load_model_and_scaler(
     model_path: str,  # Path to the saved model file.
     scaler_path: str  # Path to the saved scaler file.
-) -> Tuple[tf.keras.Model, MinMaxScaler]:  # Loaded model and scaler.
+) -> tuple[tf.keras.Model, MinMaxScaler]:  # Loaded model and scaler.
     """
     Loads the model and scaler from the given paths.
     
@@ -118,7 +120,7 @@ def load_model_and_scaler(
 
 def fijar_energia_anual(
     ano: int  # A o para el que se va a predecir la energ a.
-) -> Tuple[float, float]:  # Valor de la energ a objetivo y base.
+) -> tuple[float, float]:  # Valor de la energ a objetivo y base.
     """
     Fija la energ a objetivo y base para el a o dado.
     
@@ -243,11 +245,25 @@ def main(
                     scaler, 
                     output_path)
     
-    # Plot resultados
+    df_pred_return = df_pred.copy()
+    # Muestro una sema especifica del anio con la demanda driver y la proyectada
+    # Preprocess de los datos de calendario
+    date_range = def_rango_fecha(str(ano_to_predict))
+
+    df_pred.index = date_range
+
+
     start_date = f'{ano_to_predict}-06-15'
     end_date = pd.Timestamp(start_date) + pd.DateOffset(days=7)
-    week_data = data_to_show.loc[start_date:end_date]
-    plot_datos_semana(week_data, start_date, end_date)
+    week_data = df_pred.loc[start_date:end_date]
+    #plot_datos_semana(week_data, start_date, end_date)
+    plot_datos_semana(week_data, 
+                      start_date, 
+                      end_date,
+                      ano_to_predict,
+                      curva = "",
+                      path = "output/predicciones_semana.png")
+    return df_pred_return
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Simulador de predicciones.')
