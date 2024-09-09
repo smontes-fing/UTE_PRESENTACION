@@ -41,9 +41,9 @@ Este Notebook sirve para levantar un archivo de escenarios de predicciones de de
 
 ## Archivos relevantes
 
-- ['../datos'](../datos) Archivos de datos para levantar por los scripts
-- ['../funciones'](../funciones) funciones y módulos auxiliares
-- ['../modelos'](../modelos) Modelos precargados y sus escalers. También hay información del entrenamiento del modelo y sus hiperparámetros 
-- ['../Imagenes_pipeline'](../Imagenes_pipeline) Algunas imagenes de referencia del pipeline y del modelo Analítico.
-- ['../output'](../ouput) Directorio de salida de las imágenes de los scripts y notebooks.
-- ['../salida'](../salida) Directorio de salida de los archivos de predicciones.
+- ['datos'](datos) Archivos de datos para levantar por los scripts
+- ['funciones'](funciones) funciones y módulos auxiliares
+- ['modelos'](modelos) Modelos precargados y sus escalers. También hay información del entrenamiento del modelo y sus hiperparámetros 
+- ['Imagenes_pipeline'](Imagenes_pipeline) Algunas imagenes de referencia del pipeline y del modelo Analítico.
+- ['output'](ouput) Directorio de salida de las imágenes de los scripts y notebooks.
+- ['salida'](salida) Directorio de salida de los archivos de predicciones.
