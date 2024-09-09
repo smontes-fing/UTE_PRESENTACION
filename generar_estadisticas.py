@@ -29,7 +29,7 @@ from funciones.utils import (
 def main(
     year: int,
     demand_path: str,
-    charge_curve: str,
+    curva: str,
     ev_list: list,
 ) -> None:
     """
@@ -41,7 +41,7 @@ def main(
         The year to generate the data for.
     demand_path : str
         The path to the demand data file.
-    charge_curve : str
+    curva : str
         The type of charge curve to use.
     ev_list : list
         The list of EVs to generate data for.
@@ -72,7 +72,7 @@ def main(
     _, num_years = demand_data.shape
 
     # Genera los datos del Driver EV
-    ev_data, _ = proyeccion_driver_EV(year, ev_list, charge_curve, calendar)
+    ev_data, _ = proyeccion_driver_EV(year, ev_list, curva, calendar)
 
     # Merge de los dos dataframes demand_data y ev_data
     merged_data = pd.merge(demand_data, ev_data, left_index=True, right_index=True)
