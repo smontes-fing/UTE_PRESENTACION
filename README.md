@@ -15,7 +15,7 @@ Clonar el repositorio:
 !git clone https://github.com/smontes-fing/UTE_PRESENTACION.git
 ```
 
-'''console
+```console
 # Instalacion de dependencias
 !pip install icecream
 !pip install pandas==2.2.2
@@ -23,20 +23,23 @@ Clonar el repositorio:
 !pip install pillow matplotlib
 !pip install netCDF4
 !pip install gdown
-'''
+```
 
 
-## Notebooks 
+# Notebooks 
+
+## Predecir demanda
 - [predecir_demanda.ipynb](https://colab.research.google.com/drive/1Dv_krXmmoliADKn0dZpeN01_aZRF1jv_?authuser=1#scrollTo=PdaFGqh-dhTG) 
 Este Notebook sirve para levantar un archivos de escenarios de temperatura y generar predicciones.
 ![Sintetizador de demanda](Imagenes_pipeline/sintetizador_demanda.png)
 
+## Análisis Estadístico 
 - [generar_estadisticas.ipynb](https://colab.research.google.com/drive/1ykFmRU2u9V0cXB4ueDQmvvchR7nYdDUR?authuser=1#scrollTo=O1PRXnYkrm6b)
 Este Notebook sirve para levantar un archivo de escenarios de predicciones de demanda, agregar un Driver y generar un análisis estadístico de resultados. 
 ![Análisis estadístico](Imagenes_pipeline/driver.png)
 
 
-##Archivos relevantes
+## Archivos relevantes
 
 - ['../datos'](../datos) Archivos de datos para levantar por los scripts
 - ['../funciones'](../funciones) funciones y módulos auxiliares
