@@ -108,7 +108,7 @@ def proyeccion_driver_EV(
 ):
     # Normalizar la curva de carga de vehículos eléctricos
     perfil_carga_norm = probabilidad_carga_EVs(curva)
-    path_figure = '../UTE_E2/output/curva_carga_normalizada.png'
+    path_figure = f"output/probabilidad_carga_{curva}.png"
     graficar_curvas_carga_normalizadas(perfil_carga_norm, path_figure)
 
     if not lista_evs:
