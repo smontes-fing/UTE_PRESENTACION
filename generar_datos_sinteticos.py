@@ -5,22 +5,22 @@ import argparse
 import netCDF4
 import dask
 import time as tm
-
+from typing import List
 import warnings
 warnings.filterwarnings("ignore", message="The behavior of .*")
 
-def load_data_CDF4(file_paths):
+def load_data_CDF4(file_paths: List[str]) -> pd.DataFrame:
     """
-    Carga y combina los datos desde múltiples archivos.
+    Carga y combina los datos desde m ltiples archivos.
 
     Args:
-    file_paths (list of str): Lista de rutas de archivos a cargar.
+        file_paths (list of str): Lista de rutas de archivos a cargar.
 
     Returns:
-    pd.DataFrame: Datos combinados en un DataFrame de pandas.
+        pd.DataFrame: Datos combinados en un DataFrame de pandas.
     """
     start_time = tm.time()
-    dfs = []
+    dfs: List[pd.DataFrame] = []
     for file_path in file_paths:
         try:
             ds = xr.open_dataset(file_path, chunks='auto')
@@ -35,7 +35,7 @@ def load_data_CDF4(file_paths):
     load_time = end_time - start_time
     print(f"Tiempo de carga del archivo: {load_time:.2f} segundos")
 
-    combined_df = pd.concat(dfs, axis=0).reset_index(drop=True)
+    combined_df: pd.DataFrame = pd.concat(dfs, axis=0).reset_index(drop=True)
     combined_df['t2m'] = combined_df['t2m'] - 273.15  # Convertir de Kelvin a Celsius    
 
 
@@ -167,10 +167,12 @@ def main(years_to_generate, output_path, input_paths):
         
         input_paths_list = input_paths.split(',')
     else:
-        input_paths_list = ['../UTE_E2/datos/dataset_2011a2021_TEMP.csv', '../UTE_E2/datos/dataset_2000a2010_TEMP.csv']
+        input_paths_list = ['../datos/dataset_2011a2021_TEMP.csv', 
+                            '../datos/dataset_2000a2010_TEMP.csv'
+                            ]
 
     if not output_path:
-        output_path = '../UTE_E2/datos/temp_sintetico_{}.csv'.format(years_to_generate)
+        output_path = '../datos/temp_sintetico_{}.csv'.format(years_to_generate)
 
     try:
         data = load_data_csv(input_paths_list)

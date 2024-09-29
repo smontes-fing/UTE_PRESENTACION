@@ -177,7 +177,7 @@ def transform_data_input(data,
         data_in, _, columnas_fature, features_size = transform(data, train, Key_Label, columnas_feature)
     else:
         raise ValueError(f'Tipo desconocido: {tipo}')
-
+    
     # Obtener la ruta al directorio del script
     if scaler_path is None:
         if iteracion != '':

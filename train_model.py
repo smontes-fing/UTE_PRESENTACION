@@ -228,11 +228,12 @@ def guardar_modelo(model: tf.keras.Sequential, model_path: str) -> None:
 def main():
     # Definir parámetros
     data_path = 'datos/datosANN2008-2021.csv'
-    model_path = 'modelos/UTE_ANN_test'
-    scaler_path = 'modelos/UTE_ANN_test/scaler_UTE_ANN_test.pkl'
+    model_name= 'UTE_ANN_test'
+    model_path = 'modelos/' + model_name 
+    scaler_path = model_path + '/scaler_UTE_ANN_test.pkl'
     output_dir = model_path + '/entrenamiento'
     version = 3
-    epochs = 200
+    epochs = 2
     val_split = 0.2
     seed = 42
     dense_layer = 5
@@ -244,8 +245,7 @@ def main():
 
     # Cargar y preparar los datos, Energia_base es el valor de la demanda en 2021
     data_train, data_test, Energia_base = cargar_datos(data_path)
-    print(data_test.head(5))
-    
+    ic(data_test.head(5))
     (
     data_train, 
     label_train, 
@@ -260,7 +260,7 @@ def main():
                             val_split, 
                             Energia_base,
                             seed,
-                            escaler_path=scaler_path,
+                            scaler_path=scaler_path,
                             )
     # Crear y entrenar el modelo
     model = crear_modelo(
@@ -270,8 +270,8 @@ def main():
                         dropout, 
                         learning_rate, 
                         decay)
-    print(label_train.head(5))
-    print(label_val.head(5))
+    ic(f"Ground_truth Validacion {label_train.head(5)}")
+    ic(f"Ground_truth Validacion {label_val.head(5)}")
     history = entrenar_modelo(
                                 model, 
                                 data_train, 
@@ -289,8 +289,8 @@ def main():
     graficar_entrenamiento(history, output_dir)
 
     # Valoido el modelo contra los datos de 2021
-    print("DATOS DE TEST, valores reales 2021")
-    print(data_test.head(5))
+    ic("DATOS DE TEST, valores reales 2021")
+    ic(f"datos de test: {data_test.head(5)}")
     label_test = pd.DataFrame()
     label_test["Dem_norm"] = data_test['Demanda'] * Energia_base / data_test['Demanda_ener']
     data_test, _, _ = transform_data_input(
@@ -299,6 +299,7 @@ def main():
                                     epochs, 
                                     'norm', 
                                     Energia_base=Energia_base,
+                                    scaler_path=scaler_path,
                                     )
     pred_norm = validar_modelo(
                                 model, 
@@ -312,7 +313,6 @@ def main():
 
     # Guardar detalles del modelo
     print_and_save_model_details(model, output_dir=output_dir)
-
 
 
     
