@@ -233,6 +233,8 @@ def main(
     model, scaler   = load_model_and_scaler(model_path, scaler_path)
     ic("Modelo cargado")
     model.summary()
+
+    # Generar predicciones y las guardo en un archivo local
     print("Generando predicciones")
     df_pred = generar_predicciones(
                     data_temp, 
@@ -241,27 +243,34 @@ def main(
                     model_type, 
                     model, 
                     scaler, 
-                    output_path)
-    
-    df_pred_return = df_pred.copy()
+                    output_path
+                    )
+    ic(f"Predicciones guardadas en: {output_path}")
+   
     # Muestro una sema especifica del anio con la demanda driver y la proyectada
     # Preprocess de los datos de calendario
+    df_pred_return = df_pred.copy()
     date_range = def_rango_fecha(str(ano_to_predict))
 
-    # df_pred.iloc[:8760].index = date_range
-    df_pred.iloc.index = date_range    
+    # Asigna el rango de fechas como índice al dataframe
+    # df_pred.iloc.index = date_range    
+    df_pred.index = pd.to_datetime(date_range) 
 
-
-    start_date = f'{ano_to_predict}-06-15'
-    end_date = pd.Timestamp(start_date) + pd.DateOffset(days=7)
+    # Definir el rango de fechas
+    start_date = f'{ano_to_predict}-06-15 00:00:00'
+    start_date = pd.Timestamp(start_date)
+    end_date = start_date + pd.DateOffset(days=7)
+    print(f"start_date: {start_date}, end_date: {end_date}")
+    print(f"type start_date: {type(start_date)}, type end_date: {type(end_date)}")
     week_data = df_pred.loc[start_date:end_date]
-    #plot_datos_semana(week_data, start_date, end_date)
+
     plot_datos_semana(week_data, 
                       start_date, 
                       end_date,
                       ano_to_predict,
                       curva = "",
                       path = "output/predicciones_semana.png")
+    
     return df_pred_return
 
 if __name__ == "__main__":

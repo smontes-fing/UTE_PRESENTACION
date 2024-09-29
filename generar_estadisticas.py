@@ -8,6 +8,7 @@ Created on Fri Nov 17 10:32:11 2023
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import pandas as pd
 import random
 import argparse
@@ -32,7 +33,8 @@ def main(
     demand_path: str,
     curva: str,
     ev_list: list,
-) -> None:
+    output_path: str = None
+) -> dict:
     """
     Main function to generate the data for the UTE case study.
 
@@ -49,7 +51,8 @@ def main(
 
     Returns
     -------
-    None
+    dict
+        A dictionary with the statistics of the demand data.
     """
     # Carga datos de temperatura
     temp_data_path = 'datos/temp_sintetico_2.csv'
@@ -115,8 +118,10 @@ def main(
                                title= f"Densidad de picos anuales proyectada para {year}",
                                path=densidades_path
                                )
+    guardar_resultados(dicc_estadisticas, output_path)
 
     # return diccionario con las estadísticas para las curvas BaU y ToU
+    return dicc_estadisticas
 
 
 def proyeccion_driver_EV(
@@ -211,6 +216,26 @@ def analizar_demanda(predicc, anos_to_sim):
         estadisticas.at[ano, 'Energia'] = demanda.sum()
     return estadisticas
 
+def guardar_resultados(mi_diccionario, output_path):
+    primera_key = list(mi_diccionario.keys())[0]
+    valor_primera_key = mi_diccionario[primera_key]
+
+    if output_path is None:
+        path = 'output/estadisticas'+ primera_key +'.csv'
+    else:
+        path = f"output/estadisticas_{primera_key}.csv"
+    
+    os.makedirs('output', exist_ok=True)
+
+    try:
+        with open(path, 'w') as archivo:
+            archivo.write(f"Clave: {primera_key}, Valor: {valor_primera_key}")
+
+        print(f"Se ha guardado el archivo {path}")
+    except Exception as e:
+        print(f"Error al escribir en el archivo {path}: {e}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Análisis de predicciones de demanda de energía.')
     parser.add_argument(
@@ -235,7 +260,13 @@ if __name__ == "__main__":
                         default=[], 
                         help='Penetración de EVs, defalt: []'
                         )
+    parser.add_argument(
+                        '--output_path', 
+                        type=str,   
+                        default='salida/picos.csv', 
+                        help='File_path del archivo para guardar resultados, default: datos/picos_{ano}.csv'
+                        )
     args = parser.parse_args()
     
     # cProfile.run('main(args.ano, args.input_path, args.curva, args.evs)')
-    main(args.ano, args.demanda_path, args.curva, args.evs)
+    main(args.ano, args.demanda_path, args.curva, args.evs, args.output_path)

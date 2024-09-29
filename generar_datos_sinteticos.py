@@ -167,12 +167,12 @@ def main(years_to_generate, output_path, input_paths):
         
         input_paths_list = input_paths.split(',')
     else:
-        input_paths_list = ['../datos/dataset_2011a2021_TEMP.csv', 
-                            '../datos/dataset_2000a2010_TEMP.csv'
+        input_paths_list = ['datos/dataset_2011a2021_TEMP.csv', 
+                            'datos/dataset_2000a2010_TEMP.csv'
                             ]
 
     if not output_path:
-        output_path = '../datos/temp_sintetico_{}.csv'.format(years_to_generate)
+        output_path = 'datos/temp_sintetico_{}.csv'.format(years_to_generate)
 
     try:
         data = load_data_csv(input_paths_list)
